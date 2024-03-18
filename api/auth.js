@@ -9,6 +9,21 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 3600000
+    }
+}));
+
+
 const validateRegisterInput = [
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 6 }),
@@ -19,20 +34,9 @@ const validateLoginInput = [
     body('password').notEmpty(),
 ]
 
-app.use(cors());
-app.use(express.json());
-app.use(cookieParser());
-app.use(session({
-    secret: 'secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true, httpOnly: true, maxAge: 3600000 }
-}));
-
-app.get("/api/auth", (req, res) => {
+app.get("/api/auth", (_, res) => {
     res.status(200).json({ message: "API is up and running on /api/auth" });
 });
-
 
 app.post('/api/auth/register', validateRegisterInput, async (req, res) => {
     const errors = validationResult(req);
