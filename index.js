@@ -2,10 +2,21 @@ const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
+const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const app = express();
+
+const validateRegisterInput = [
+    body('email').isEmail().normalizeEmail(),
+    body('password').isLength({ min: 6 }),
+];
+
+const validateLoginInput = [
+    body('email').isEmail().normalizeEmail(),
+    body('password').notEmpty(),
+]
 
 app.use(express.json());
 app.use(cookieParser());
@@ -17,7 +28,12 @@ app.use(session
         cookie: { secure: false }
     }));
 
-app.post('/register', async (req, res) => {
+app.post('/register', validateRegisterInput, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const { email, password } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,7 +49,11 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", validateLoginInput, async (req, res) => {
+    const errors = validateLoginInput(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const { email, password } = req.body;
     try {
         const user = await prisma.user.findUnique({ where: { email } });
