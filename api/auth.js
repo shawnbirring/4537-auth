@@ -28,9 +28,14 @@ app.use(session
         cookie: { secure: false }
     }));
 
-app.get("/", (req, res) => {
-    res.status(200).json({ message: "API is up and running" });
+// app.get("/", (req, res) => {
+//     res.status(200).json({ message: "API is up and running" });
+// });
+
+app.get("/api/auth", (req, res) => {
+    res.status(200).json({ message: "API is up and running on /api/auth" });
 });
+
 
 app.post('/register', validateRegisterInput, async (req, res) => {
     const errors = validationResult(req);
