@@ -12,16 +12,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({
-    secret: 'secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: false,
-        httpOnly: true,
-        maxAge: 3600000
-    }
-}));
+// app.use(session({
+//     secret: 'secret',
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//         secure: false,
+//         httpOnly: true,
+//         maxAge: 3600000
+//     }
+// }));
 
 
 const validateRegisterInput = [
@@ -75,56 +75,56 @@ app.post("/api/auth/login", validateLoginInput, async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
-        req.session.userID = user.id;
+        // req.session.userID = user.id;
         res.status(200).json({ message: "Login Successful" });
     } catch (error) {
         res.status(500).json({ error: "An error occurred while loggin in" });
     }
 })
 
-app.get("/api/auth/admin", async (req, res) => {
-    try {
-        const isAdmin = await prisma.user.findFirst({
-            where: {
-                id: req.session.userID,
-                isAdmin: true
-            }
-        });
-        if (!isAdmin) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-        res.status(200).json({ message: 'Admin page', apiCalls: isAdmin.apiCalls });
-    } catch (error) {
-        res.status(500).json({ error: 'An error occurred while accessing admin page' });
-    }
-})
+// app.get("/api/auth/admin", async (req, res) => {
+//     try {
+//         const isAdmin = await prisma.user.findFirst({
+//             where: {
+//                 id: req.session.userID,
+//                 isAdmin: true
+//             }
+//         });
+//         if (!isAdmin) {
+//             return res.status(403).json({ error: 'Forbidden' });
+//         }
+//         res.status(200).json({ message: 'Admin page', apiCalls: isAdmin.apiCalls });
+//     } catch (error) {
+//         res.status(500).json({ error: 'An error occurred while accessing admin page' });
+//     }
+// })
 
-app.get('/api/auth/user', async (req, res) => {
-    try {
-        const user = await prisma.user.findUnique({
-            where: { id: req.session.userId }
-        });
-        res.status(200).json({ message: 'User landing page', apiCalls: user.apiCalls });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while accessing user page' });
-    }
-});
+// app.get('/api/auth/user', async (req, res) => {
+//     try {
+//         const user = await prisma.user.findUnique({
+//             where: { id: req.session.userId }
+//         });
+//         res.status(200).json({ message: 'User landing page', apiCalls: user.apiCalls });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'An error occurred while accessing user page' });
+//     }
+// });
 
-app.get('/api/auth/logout', async (req, res) => {
-    try {
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({ error: 'An error occurred while logging out' });
-            }
-            res.clearCookie('connect.sid');
-            res.status(200).json({ message: 'Logout successful' });
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while logging out' });
-    }
-});
+// app.get('/api/auth/logout', async (req, res) => {
+//     try {
+//         req.session.destroy((err) => {
+//             if (err) {
+//                 return res.status(500).json({ error: 'An error occurred while logging out' });
+//             }
+//             res.clearCookie('connect.sid');
+//             res.status(200).json({ message: 'Logout successful' });
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'An error occurred while logging out' });
+//     }
+// });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
