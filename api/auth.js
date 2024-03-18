@@ -20,13 +20,12 @@ const validateLoginInput = [
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(session
-    ({
-        secret: 'secret',
-        resave: false,
-        saveUninitialized: false,
-        cookie: { secure: false }
-    }));
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true, httpOnly: true, maxAge: 3600000 }
+}));
 
 app.get("/api/auth", (req, res) => {
     res.status(200).json({ message: "API is up and running on /api/auth" });
